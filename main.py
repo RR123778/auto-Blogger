@@ -88,6 +88,7 @@ def generate_blog_content():
         "The first line MUST be the title wrapped inside <h1> tags."
     )
     
+    # Clean direct URL String
     url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=){GEMINI_API_KEY}"
     headers = {'Content-Type': 'application/json'}
     payload = {
