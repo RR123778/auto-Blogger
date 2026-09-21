@@ -19,21 +19,22 @@ BLOG_LANG = os.getenv("BLOG_LANG", "HINDI")
 
 
 # ==========================================
-# GEMINI AI GENERATOR (FIXED)
+# GEMINI BLOG GENERATOR (FINAL FIX)
 # ==========================================
 def generate_blog_content():
     print("🤖 Generating blog...")
 
     prompt = f"""
-Write a SEO optimized blog in {BLOG_LANG}.
-Use HTML tags <h1>, <h2>, <p>.
-First line must be title inside <h1>.
+Write a highly engaging SEO optimized blog in {BLOG_LANG}.
+Use HTML tags <h1>, <h2>, <p>, <ul>.
+First line must be <h1> title.
 """
 
-    # ✅ FIXED WORKING MODEL
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
+    # ✅ FINAL CORRECT API (WORKING)
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
     headers = {"Content-Type": "application/json"}
+
     payload = {
         "contents": [
             {
@@ -42,35 +43,35 @@ First line must be title inside <h1>.
         ]
     }
 
-    response = requests.post(url, json=payload, headers=headers, timeout=30)
-
-    # 🔥 DEBUG PRINT (very important)
-    print("Status:", response.status_code)
-    print("Response:", response.text[:500])
-
-    response.raise_for_status()
-
-    data = response.json()
-
     try:
-        raw = data['candidates'][0]['content']['parts'][0]['text']
-    except:
-        raise Exception("Gemini response format changed / blocked")
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
 
+        print("Status:", response.status_code)
+        print("Response:", response.text[:300])
+
+        response.raise_for_status()
+
+        data = response.json()
+        raw = data['candidates'][0]['content']['parts'][0]['text']
+
+    except Exception as e:
+        raise Exception(f"Gemini API Failed: {e}")
+
+    # Extract title
     title_match = re.search(r'<h1>(.*?)</h1>', raw, re.DOTALL)
 
     if title_match:
-        title = title_match.group(1)
-        body = re.sub(r'<h1>.*?</h1>', '', raw, count=1)
+        title = title_match.group(1).strip()
+        body = re.sub(r'<h1>.*?</h1>', '', raw, count=1).strip()
     else:
         title = "Auto Blog"
         body = raw
 
-    return title.strip(), body.strip()
+    return title, body
 
 
 # ==========================================
-# IMAGE GENERATOR (FIXED)
+# IMAGE GENERATOR
 # ==========================================
 def get_image(topic):
     encoded = urllib.parse.quote(topic)
@@ -93,7 +94,7 @@ def publish(title, html):
         server.login(GMAIL_USER, GMAIL_PASS)
         server.send_message(msg)
 
-    print("✅ Blog Sent!")
+    print("✅ Blog Sent Successfully!")
 
 
 # ==========================================
@@ -101,7 +102,7 @@ def publish(title, html):
 # ==========================================
 def send_whatsapp(title, read_time):
     try:
-        text = f"🚀 New Blog\n{title}\n⏱ {read_time} min"
+        text = f"🚀 New Blog Published!\n\n{title}\n⏱ {read_time} min read"
         encoded = urllib.parse.quote(text)
 
         url = f"https://api.textmebot.com/send.php?recipient={WA_PHONE}&apikey={TMB_KEY}&text={encoded}"
@@ -109,32 +110,32 @@ def send_whatsapp(title, read_time):
         r = requests.get(url, timeout=10)
 
         if r.status_code != 200:
-            print("WhatsApp failed:", r.text)
+            print("⚠️ WhatsApp failed:", r.text)
 
     except Exception as e:
-        print("WhatsApp error:", e)
+        print("⚠️ WhatsApp error:", e)
 
 
 # ==========================================
 # MAIN
 # ==========================================
 def main():
-    print("🚀 Starting...")
+    print("🚀 Starting Auto Blogger...")
 
     title, body = generate_blog_content()
 
     words = len(re.sub(r'<[^>]+>', '', body).split())
     read_time = max(1, math.ceil(words / 200))
 
-    img = get_image(title)
+    image = get_image(title)
 
-    final_html = img + f"<p>⏱ Reading Time: {read_time} min</p><hr>" + body
+    final_html = image + f"<p>⏱ Reading Time: {read_time} min</p><hr>" + body
 
     publish(title, final_html)
 
     send_whatsapp(title, read_time)
 
-    print("🎉 DONE SUCCESS")
+    print("🎉 ALL DONE SUCCESSFULLY!")
 
 
 if __name__ == "__main__":
