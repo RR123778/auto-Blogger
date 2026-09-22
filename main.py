@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 import requests
 
 # ==========================================
-# 1. ENVIRONMENT VARIABLES & SECRETS DEBUG
+# 1. ENVIRONMENT VARIABLES & SECRETS
 # ==========================================
 print("==========================================")
 print("🔍 [DEBUG] Step 1: Checking Environment Variables...")
@@ -87,7 +87,7 @@ def send_whatsapp_alert(title, read_time, topic):
 
 
 # ==========================================
-# 4. GEMINI AI CONTENT GENERATOR WITH DETAILED DEBUG
+# 4. GEMINI AI CONTENT GENERATOR
 # ==========================================
 def generate_blog_content():
     print("🤖 [Gemini Engine] Generating trending blog post...")
@@ -143,7 +143,7 @@ def get_featured_image(topic):
 
 
 # ==========================================
-# 6. GMAIL-TO-BLOGGER PUBLISHER ENGINE WITH SMTP DEBUG
+# 6. GMAIL-TO-BLOGGER PUBLISHER ENGINE
 # ==========================================
 def publish_to_blogger(title, full_html):
     print("📧 [Blogger Engine] Publishing blog via Gmail Secret Address...")
@@ -156,7 +156,7 @@ def publish_to_blogger(title, full_html):
 
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as server:
-            server.set_debuglevel(1)  # Enables full SMTP connection debug output
+            server.set_debuglevel(1)
             print("🔍 [DEBUG] Connecting to Gmail SMTP SSL...")
             server.login(GMAIL_USER, GMAIL_PASS)
             print("🔍 [DEBUG] Gmail Login Successful! Sending Message...")
