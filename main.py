@@ -139,7 +139,7 @@ def get_featured_image(topic):
     print("🎨 [Image Engine] Generating featured image via Pollinations.ai...")
     prompt_encoded = urllib.parse.quote(f"hd cinematic concept art of {topic}, vibrant lighting, 8k resolution")
     clean_image_url = f"[https://image.pollinations.ai/prompt/](https://image.pollinations.ai/prompt/){prompt_encoded}?width=800&height=450&nologo=true"
-    print(f"🔍 [DEBUG] Pollinations Target URL: {clean_image_url}")
+    clean_image_url = "[https://image.pollinations.ai/prompt/](https://image.pollinations.ai/prompt/)" + prompt_encoded + "?width=800&height=450&nologo=true"
     
     try:
         # Image fetch karke Base64 string banate hain taaki Blogger email me bypass na ho
