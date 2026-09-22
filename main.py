@@ -75,7 +75,7 @@ def send_whatsapp_alert(title, read_time, topic):
 
 
 # ==========================================
-# 4. GEMINI AI CONTENT GENERATOR (v1beta FIXED)
+# 4. GEMINI AI CONTENT GENERATOR (FIXED INDENTATION & ENDPOINT)
 # ==========================================
 def generate_blog_content():
     print("🤖 [Gemini Engine] Generating trending blog post...")
@@ -88,14 +88,17 @@ def generate_blog_content():
         "The first line MUST be the title wrapped inside <h1> tags."
     )
     
-    # FIXED: Updated URL to v1beta API endpoint
-url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=){GEMINI_API_KEY}"
     headers = {'Content-Type': 'application/json'}
     payload = {
         "contents": [{"parts": [{"text": prompt}]}]
     }
 
     response = requests.post(url, json=payload, headers=headers, timeout=30)
+    
+    if response.status_code != 200:
+        print(f"❌ Gemini API Failed with Status Code {response.status_code}: {response.text}")
+        
     response.raise_for_status()
     
     data = response.json()
@@ -132,34 +135,3 @@ def publish_to_blogger(title, full_html):
     msg['Subject'] = title
     msg['From'] = GMAIL_USER
     msg['To'] = BLOGGER_EMAIL
-
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as server:
-        server.login(GMAIL_USER, GMAIL_PASS)
-        server.send_message(msg)
-    
-    print("✅ [Blogger Engine] Successfully delivered to Blogger!")
-
-
-# ==========================================
-# MAIN EXECUTION FLOW
-# ==========================================
-def main():
-    print("🚀 [System] Starting Auto Blog Publisher...")
-    
-    title, body_html = generate_blog_content()
-    
-    word_count = len(re.sub(r'<[^>]*>', '', body_html).split())
-    read_time = max(1, math.ceil(word_count / 200))
-    
-    image_html = get_featured_image(title)
-    badge_html = f'<p>⏱️ <i>Reading Time: ~{read_time} min</i></p><hr>'
-    final_content = image_html + badge_html + body_html
-    
-    publish_to_blogger(title, final_content)
-    
-    send_whatsapp_alert(title, read_time, title)
-    
-    print("🎉 [System] All tasks completed successfully!")
-
-if __name__ == "__main__":
-    main()
